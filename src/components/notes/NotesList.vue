@@ -25,11 +25,20 @@
         <!-- render notes in a list -->
         <div class="container">
             <div class="list-group">
-                <a v-for="note in filteredNotes" class="list-group-item" href="#" :class="{active: activeNote === note}" @click="updateActiveNote(note)">
+                <!--<a v-for="note in filteredNotes" class="list-group-item" href="#" :class="{active: activeNote === note}" @click="updateActiveNote(note)">
                     <h4 class="list-group-item-heading">
                         {{note.title}}
                     </h4>
-                </a>
+                </a>-->
+                <el-collapse v-model="activeNames" accordion>
+
+                    <el-collapse-item v-for="(note,index) in filteredNotes" :title="note.catetory" :name="(index+1)">
+                        <div :class="{active: activeNote === note}" @click="updateActiveNote(note)">{{note.text}}</div>
+                    </el-collapse-item>
+
+                </el-collapse>
+
+                <!--page-->
                 <nav v-if="showPagination">
                     <ul class="pagination">
                         <li v-if="showPrePage"><a href="#" @click="prePage">&laquo;</a></li>
@@ -52,7 +61,8 @@
                 searchWord: '',
                 pageNums: [1, 2, 3, 4, 5],
                 currentPage: 1,
-                showPagination: true
+                showPagination: true,
+                activeNames: []
             }
         },
         computed: {
