@@ -25,7 +25,7 @@
 </el-form>
 </template>
 <script>
-    import { requestRegister } from '../../api/api';
+    import { requestRegister, fetchUser } from '../../api/api';
     import NProgress from 'nprogress';
     export default {
         data() {
@@ -95,6 +95,7 @@
                             this.logining = false;
                             NProgress.done();
                             let { msg, code, user } = data;
+                            console.log(code);
                             if (code !== 200) {
                                 this.$notify({
                                     title: '错误',
@@ -102,13 +103,21 @@
                                     type: 'error'
                                 });
                             } else {
-                                // localStorage.setItem('user', JSON.stringify(user));
+                                const h = this.$createElement;
+                                localStorage.setItem('user', JSON.stringify(user));
+                                console.log(this.$route);
+                                this.$notify({
+                                    title: '注册成功',
+                                    message: h('a', { attrs: { href: 'login' }, style: { color: 'red' } }, '请点击登录'),
+                                    // message: '<router-link to="/login">请点击登录</router-link>',
+                                    type: 'success'
+                                })
                                 // if (this.$route.query.redirect) {
                                 //     this.$router.push({ path: this.$route.query.redirect });
                                 // } else {
                                 //     this.$router.push({ path: '/table' });
                                 // }
-                                console.log(user);
+                                // console.log(user);
                             }
                         })
                     } else {

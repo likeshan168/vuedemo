@@ -16,15 +16,15 @@
 </el-form>
 </template>
 <script>
-    import { requestLogin } from '../../api/api';
+    import { requestLogin,fetchUser } from '../../api/api';
     import NProgress from 'nprogress';
     export default {
         data() {
             return {
                 logining: false,
                 formModel: {
-                    account: '',
-                    checkPass: ''
+                    account: fetchUser().name,
+                    checkPass: fetchUser().password
                 },
                 formRule: {
                     account: [
@@ -51,7 +51,7 @@
                     if (valid) {
                         this.logining = true;
                         NProgress.start();
-                        var loginParams = { username: this.formModel.account, password: this.formModel.checkPass };
+                        var loginParams = { name: this.formModel.account, password: this.formModel.checkPass };
                         requestLogin(loginParams).then(data => {
                             this.logining = false;
                             NProgress.done();
@@ -67,7 +67,7 @@
                                 if (this.$route.query.redirect) {
                                     this.$router.push({ path: this.$route.query.redirect });
                                 } else {
-                                    this.$router.push({ path: '/table' });
+                                    this.$router.push({ path: '/user_list' });
                                 }
                             }
                         })

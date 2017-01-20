@@ -12,6 +12,8 @@ import 'nprogress/nprogress.css'
 //1. 定义（路由）组件。
 import Login from './components/login/login'
 import Register from './components/register/register'
+import Home from './components/Home';
+import UserList from './components/user/user_list';
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -19,15 +21,28 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/login',
-    component: Login
+    component: Login,
+    hidden: true//不显示在导航中
   },
   {
     path: '/register',
-    component: Register
+    component: Register,
+    hidden: true//不显示在导航中
+  },
+  {
+    path: '/',
+    component: Home,
+    name: '用户管理',
+    iconCls: 'fa fa-user',
+    children: [
+      { path: '/user_list', name: '用户列表', component: UserList },
+      // { path: '/add_user', name: '新增用户' }
+    ]
   }
 ]
 //3. 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 
