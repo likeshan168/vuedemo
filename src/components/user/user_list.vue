@@ -17,7 +17,12 @@
         <!--列表-->
         <template>
             <el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
-<el-table-column type="index" width="60">
+<el-table-column type="index" width="80" label="序号">
+</el-table-column>
+<el-table-column width="80" label="序号">
+    <template scope="scope">
+        {{(scope.$index + 1)+(page-1)}}
+    </template>
 </el-table-column>
 <el-table-column prop="name" label="用户名" width="180" sortable>
 </el-table-column>
@@ -122,7 +127,8 @@
             getUsers() {
                 let para = {
                     index: this.page,
-                    // size: this.size,
+                    size: this.size,
+                    orderField:'Id'
                     // whereStr: {
                     //     name: this.filters.name
                     // }
@@ -131,8 +137,8 @@
                 NProgress.start();
                 getUserList(para).then(res => {
                     console.log(res);
-                    this.total = res.length;
-                    this.users = res;
+                    this.total = res.total;
+                    this.users = res.users;
                     this.listLoading = false;
                     NProgress.done();
                 });
