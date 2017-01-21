@@ -53,9 +53,9 @@ theme="dark" unique-opened router>
 	export default {
 		data() {
 			return {
-				currentPath: '/table',
-				currentPathName: 'Table',
-				currentPathNameParent: '导航一',
+				currentPath: '/user_list',
+				currentPathName: '用户列表',
+				currentPathNameParent: '用户管理',
 				form: {
 					name: '',
 					region: '',

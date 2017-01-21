@@ -2,26 +2,30 @@
     <section>
         <!--工具条-->
         <el-col :span="24" class="toolbar">
-            <el-form :inline="true" :model="filters">
-                <el-form-item>
-                    <el-input v-model="filters.name" placeholder="姓名"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" v-on:click="getUsers">查询</el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="handleAdd">新增</el-button>
-                </el-form-item>
-            </el-form>
+            <!--<el-form :inline="true" :model="filters" ref="filters" v-on:submit="getUsers">-->
+            <!--<el-form-item prop="filterName">-->
+            <el-col :span="6">
+                <el-input v-model="filters.filterName" placeholder="姓名" auto-complete="off" @keyup.enter.native="getUsers"></el-input>
+            </el-col>
+
+            <!--</el-form-item>-->
+            <!--<el-form-item>-->
+            <el-button type="primary" @click.native="getUsers">查询</el-button>
+            <!--</el-form-item>
+                <el-form-item>-->
+            <el-button type="primary" @click.native="handleAdd">新增</el-button>
+            <!--</el-form-item>
+            </el-form>-->
+
         </el-col>
         <!--列表-->
         <template>
             <el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
-<el-table-column type="index" width="80" label="序号">
-</el-table-column>
+<!--<el-table-column type="index" width="80" label="序号">
+</el-table-column>-->
 <el-table-column width="80" label="序号">
     <template scope="scope">
-        {{(scope.$index + 1)+(page-1)}}
+        {{(scope.$index + 1)+(page-1)*size}}
     </template>
 </el-table-column>
 <el-table-column prop="name" label="用户名" width="180" sortable>
@@ -42,24 +46,24 @@
 </template>
 <!--分页-->
 <el-col :span="24" class="toolbar" style="padding-bottom:10px;">
-<el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange" :page-size="size" :total="total"
-    style="float:right;">
+<el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
+    :page-size="size" :total="total" style="float:right;">
 </el-pagination>
 </el-col>
 <!--编辑界面-->
 <el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
     <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-        <el-form-item label="用户名'" prop="name">
+        <el-form-item label="用户名" prop="name">
             <el-input v-model="editForm.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
             <el-input v-model="editForm.password" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱">
-            <el-input v-model="editForm.email" ></el-input-number>
+        <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editForm.email"></el-input-number>
         </el-form-item>
-        <el-form-item label="手机号">
-            <el-input v-model="editForm.phoneNumber" ></el-input-number>
+        <el-form-item label="手机号" prop="phoneNumber">
+            <el-input v-model="editForm.phoneNumber"></el-input-number>
         </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -76,7 +80,12 @@
         data() {
             return {
                 filters: {
-                    name: ''
+                    filterName: ''
+                },
+                filtersForm: {
+                    filterName: [
+                        { required: true, message: '请输入查询条件', trigger: 'blur' }
+                    ]
                 },
                 users: [],
                 total: 0,
@@ -119,20 +128,29 @@
                 this.page = val;
                 this.getUsers();
             },
-            handleSizeChange(val){
+            handleSizeChange(val) {
                 this.size = val;
                 this.getUsers();
             },
             //获取用户列表
             getUsers() {
-                let para = {
-                    index: this.page,
-                    size: this.size,
-                    orderField:'Id'
-                    // whereStr: {
-                    //     name: this.filters.name
-                    // }
-                };
+                // alert('alert');
+                let para;
+                if (this.filters.filterName) {
+                    para = {
+                        index: this.page,
+                        size: this.size,
+                        orderField: 'Id',
+                        whereStr: `name='${this.filters.filterName}'`
+                    };
+                } else {
+                    para = {
+                        index: this.page,
+                        size: this.size,
+                        orderField: 'Id'
+                    };
+                }
+
                 this.listLoading = true;
                 NProgress.start();
                 getUserList(para).then(res => {
@@ -142,6 +160,8 @@
                     this.listLoading = false;
                     NProgress.done();
                 });
+
+                return false;
             },
             //删除
             handleDel(row) {
@@ -164,11 +184,11 @@
                     })
 
                 }).catch(() => {
-                    _this.$notify({
-                        title: '失败',
-                        message: '删除失败',
-                        type: 'error'
-                    });
+                    // _this.$notify({
+                    //     title: '失败',
+                    //     message: '删除失败',
+                    //     type: 'error'
+                    // });
                 })
             },
             //编辑 or 新增
