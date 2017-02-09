@@ -2,11 +2,15 @@ import axios from 'axios';
 
 let base = 'http://localhost:63787/api/account';
 
-export const requestLogin = params => { return axios.post(`${base}/login`, params).then(res => res.data); };
+export const requestLogin = params => {
+    return axios.post(`${base}/login`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
 export const requestRegister = params => { return axios.post(`${base}/register`, params).then(res => res.data); };
-export const updateUser = params => { return axios.post(`${base}/update`, params).then(res => res.data);};
-export const deleteUser = params => { return axios.post(`${base}/delete`, params).then(res => res.data);};
-export const getUserList = params => { return axios.post(`${base}/getList`, params).then(res => res.data);};
+export const updateUser = params => { return axios.post(`${base}/update`, params).then(res => res.data); };
+export const deleteUser = params => { return axios.post(`${base}/delete`, params).then(res => res.data); };
+export const getUserList = params => { return axios.post(`${base}/getList`, params).then(res => res.data); };
 //local store
 const USER_KEY = 'user';
 export const fetchUser = () => {

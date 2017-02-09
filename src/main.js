@@ -13,7 +13,11 @@ import 'nprogress/nprogress.css'
 import Login from './components/login/login'
 import Register from './components/register/register'
 import Home from './components/Home';
+import Intro from './components/Intro';
 import UserList from './components/user/user_list';
+import UploadData from './components/commission/upload_data';
+import ExportData from './components/commission/export_data';
+import CommissionCalculation from './components/commission/commission_calculation';
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -32,13 +36,36 @@ const routes = [
   {
     path: '/',
     component: Home,
+    name: '首页',
+    iconCls: 'fa fa-home',
+    hidden: true,//不显示在导航中
+    children: [
+      { path: '/', name: '首页', component: Intro }
+    ]
+  },
+  {
+    path: '/',
+    component: Home,
     name: '用户管理',
     iconCls: 'fa fa-user',
     children: [
-      { path: '/user_list', name: '用户列表', component: UserList },
+      { path: '/user_list', name: '用户列表', component: UserList, iconCls: 'fa fa-users' },
       // { path: '/add_user', name: '新增用户' }
     ]
-  }
+  },
+  {
+    path: '/',
+    component: Home,
+    name: '计提',
+    iconCls: 'fa fa-calculator',
+    children: [
+      { path: '/upload_data', name: '导入数据', component: UploadData, iconCls: 'fa fa-cloud-upload' },
+      { path: '/export_data', name: '导出数据', component: ExportData, iconCls: 'fa fa-cloud-download' },
+      { path: '/commission_calculation', name: '计算提成', component: CommissionCalculation, iconCls: 'fa fa-calculator' },
+      // { path: '/add_user', name: '新增用户' }
+    ]
+  },
+
 ]
 //3. 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({
@@ -48,7 +75,22 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  next()
+  // console.log(sessionStorage.getItem('access_token'));
+  try {
+    if (!to.fullPath.startsWith("/login") && !sessionStorage.getItem('access_token')) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    });
+  }
 })
 
 router.afterEach(transition => {

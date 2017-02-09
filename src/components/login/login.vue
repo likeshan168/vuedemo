@@ -8,15 +8,17 @@
             <el-input type="password" v-model="formModel.checkPass" auto-complete="off" placeholder="密码"></el-input>
         </el-form-item>
         <el-checkbox v-model="checked" checked style="margin:0px 0px 35px 0px;">记住密码</el-checkbox>
-<el-form-item style="width:100%;">
-<el-button type="primary" style="width: 100%" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
-<!--<el-button @click.native.prevent="handleReset2('formModel')">重置</el-button>-->
-<router-link to="/register" class="register">注册</router-link>
-</el-form-item>
-</el-form>
+        <el-form-item style="width:100%;">
+            <el-button type="primary" style="width: 100%" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
+            <!--<el-button @click.native.prevent="handleReset2('formModel')">重置</el-button>-->
+
+            <!--以后添加注册功能，取消下面的注释-->
+            <!--<router-link to="/register" class="register">注册</router-link>-->
+        </el-form-item>
+    </el-form>
 </template>
 <script>
-    import { requestLogin,fetchUser } from '../../api/api';
+    import { requestLogin, fetchUser } from '../../api/api';
     import NProgress from 'nprogress';
     export default {
         data() {
@@ -46,68 +48,76 @@
             },
             //提交表单
             handleSubmit2() {
-                let _this = this;
-                this.$refs.formModel.validate((valid) => {
-                    if (valid) {
-                        this.logining = true;
-                        NProgress.start();
-                        var loginParams = { name: this.formModel.account, password: this.formModel.checkPass };
-                        requestLogin(loginParams).then(data => {
-                            this.logining = false;
-                            NProgress.done();
-                            let { msg, code, user } = data;
-                            if (code !== 200) {
-                                this.$notify({
-                                    title: '错误',
-                                    message: msg,
-                                    type: 'error'
-                                });
-                            } else {
-                                localStorage.setItem('user', JSON.stringify(user));
-                                if (this.$route.query.redirect) {
-                                    this.$router.push({ path: this.$route.query.redirect });
+                try {
+                    let _this = this;
+                    this.$refs.formModel.validate((valid) => {
+                        if (valid) {
+                            this.logining = true;
+                            NProgress.start();
+                            var loginParams = { name: this.formModel.account, password: this.formModel.checkPass };
+                            requestLogin(loginParams).then(data => {
+                                this.logining = false;
+                                NProgress.done();
+                                let { msg, code, user } = data;
+                                if (code !== 200) {
+                                    this.$notify({
+                                        title: '错误',
+                                        message: msg,
+                                        type: 'error'
+                                    });
                                 } else {
-                                    this.$router.push({ path: '/user_list' });
+                                    sessionStorage.setItem('access_token', user.accessToken);
+                                    localStorage.setItem('user', JSON.stringify(user));
+                                    if (this.$route.query.redirect) {
+                                        this.$router.push({ path: this.$route.query.redirect });
+                                    } else {
+                                        this.$router.push({ path: '/' });
+                                    }
                                 }
-                            }
-                        })
-                    } else {
-                        console.log('error submit');
-                        return false;
-                    }
-                });
+                            })
+                        } else {
+                            console.log('error submit');
+                            return false;
+                        }
+                    });
+                } catch (error) {
+                    this.$alert(error, '错误信息', { confirmButtonText: '确定' });
+                }
+
             }
         }
     }
+
 </script>
 
 <style scoped>
-  .card-box {
-    padding: 20px;
-    /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    background-clip: padding-box;
-    margin-bottom: 20px;
-    background-color: #F9FAFC;
-    margin: 120px auto;
-    width: 400px;
-    border: 2px solid #8492A6;
-  }
-  
-  .title {
-    margin: 0px auto 40px auto;
-    text-align: center;
-    color: #505458;
-  }
-  
-  .loginform {
-    width: 350px;
-    padding: 35px 35px 15px 35px;
-  }
-  .register{
-      position: relative;
-      left: 318px;
-  }
+    .card-box {
+        padding: 20px;
+        /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+        -moz-border-radius: 5px;
+        background-clip: padding-box;
+        margin-bottom: 20px;
+        background-color: #F9FAFC;
+        margin: 120px auto;
+        width: 400px;
+        border: 2px solid #8492A6;
+    }
+    
+    .title {
+        margin: 0px auto 40px auto;
+        text-align: center;
+        color: #505458;
+    }
+    
+    .loginform {
+        width: 350px;
+        padding: 35px 35px 15px 35px;
+    }
+    
+    .register {
+        position: relative;
+        left: 318px;
+    }
 </style>

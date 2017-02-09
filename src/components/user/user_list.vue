@@ -7,7 +7,6 @@
             <el-col :span="6">
                 <el-input v-model="filters.filterName" placeholder="姓名" auto-complete="off" @keyup.enter.native="getUsers"></el-input>
             </el-col>
-
             <!--</el-form-item>-->
             <!--<el-form-item>-->
             <el-button type="primary" @click.native="getUsers">查询</el-button>
@@ -16,62 +15,61 @@
             <el-button type="primary" @click.native="handleAdd">新增</el-button>
             <!--</el-form-item>
             </el-form>-->
-
         </el-col>
         <!--列表-->
         <template>
             <el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
-<!--<el-table-column type="index" width="80" label="序号">
-</el-table-column>-->
-<el-table-column width="80" label="序号">
-    <template scope="scope">
-        {{(scope.$index + 1)+(page-1)*size}}
-    </template>
-</el-table-column>
-<el-table-column prop="name" label="用户名" width="180" sortable>
-</el-table-column>
-<el-table-column prop="password" label="密码" width="100" :formatter="formatSex" sortable>
-</el-table-column>
-<el-table-column prop="email" label="邮箱" width="200" sortable>
-</el-table-column>
-<el-table-column prop="phoneNumber" label="手机号" width="180" sortable>
-</el-table-column>
-<el-table-column inline-template :context="_self" label="操作" width="140">
-    <span>
+                <!--<el-table-column type="index" width="80" label="序号">
+                </el-table-column>-->
+                <el-table-column width="80" label="序号">
+                    <template scope="scope">
+                        {{(scope.$index + 1)+(page-1)*size}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="用户名" width="180" sortable>
+                </el-table-column>
+                <el-table-column prop="password" label="密码" width="100" :formatter="formatSex" sortable>
+                </el-table-column>
+                <el-table-column prop="email" label="邮箱" width="200" sortable>
+                </el-table-column>
+                <el-table-column prop="phoneNumber" label="手机号" width="180" sortable>
+                </el-table-column>
+                <el-table-column inline-template :context="_self" label="操作" width="140">
+                    <span>
                         <el-button size="small" @click="handleEdit(row)">编辑</el-button>
                         <el-button type="danger" size="small" @click="handleDel(row)">删除</el-button>
                     </span>
-</el-table-column>
-</el-table>
-</template>
-<!--分页-->
-<el-col :span="24" class="toolbar" style="padding-bottom:10px;">
-<el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
-    :page-size="size" :total="total" style="float:right;">
-</el-pagination>
-</el-col>
-<!--编辑界面-->
-<el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
-    <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-        <el-form-item label="用户名" prop="name">
-            <el-input v-model="editForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-            <el-input v-model="editForm.password" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-            <el-input v-model="editForm.email"></el-input-number>
-        </el-form-item>
-        <el-form-item label="手机号" prop="phoneNumber">
-            <el-input v-model="editForm.phoneNumber"></el-input-number>
-        </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-        <el-button @click.native="editFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click.native="editSubmit" :loading="editLoading">{{btnEditText}}</el-button>
-    </div>
-</el-dialog>
-</section>
+                </el-table-column>
+            </el-table>
+        </template>
+        <!--分页-->
+        <el-col :span="24" class="toolbar" style="padding-bottom:10px;">
+            <el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
+                :page-size="size" :total="total" style="float:right;">
+            </el-pagination>
+        </el-col>
+        <!--编辑界面-->
+        <el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
+            <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+                <el-form-item label="用户名" prop="name">
+                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="editForm.password" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="editForm.email"></el-input-number>
+                </el-form-item>
+                <el-form-item label="手机号" prop="phoneNumber">
+                    <el-input v-model="editForm.phoneNumber"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click.native="editFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click.native="editSubmit" :loading="editLoading">{{btnEditText}}</el-button>
+            </div>
+        </el-dialog>
+    </section>
 </template>
 <script>
     import NProgress from 'nprogress';
@@ -154,7 +152,6 @@
                 this.listLoading = true;
                 NProgress.start();
                 getUserList(para).then(res => {
-                    console.log(res);
                     this.total = res.total;
                     this.users = res.users;
                     this.listLoading = false;
@@ -263,7 +260,6 @@
 
         },
         mounted() {
-            console.log('mounted')
             this.getUsers();
         }
     }
