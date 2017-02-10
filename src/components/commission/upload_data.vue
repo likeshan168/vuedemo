@@ -7,41 +7,16 @@
         <div class="el-upload__tip" slot="tip">只能上传xls/xlsx文件</div>
     </el-upload>
     <el-dialog :title="editFormTtile" v-model="tableVisible" :close-on-click-modal="false">
-      <el-table
+      <el-table highlight-current-row v-loading="listLoading"
         :data="tableData"
+        height="300"
         border
-        style="width: 100%">
-        <!--<el-table-column
-          prop="date"
-          label="日期"
-          sortable
-          width="180">
+        style="width: auto">
+        <el-table-column type="index" width="80" label="序号">
         </el-table-column>
-        <el-table-column
-          prop="name"
-          label="姓名"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="address"
-          label="地址"
-          :formatter="formatter">
-        </el-table-column>-->
-        <el-table-column v-for="(column,index) in columns"
-          prop="column"
-          label="column">
-        </el-table-column>
-        <!--<el-table-column
-          prop="tag"
-          label="标签"
-          width="100"
-          :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
-          :filter-method="filterTag">
-          <template scope="scope">
-            <el-tag
-              :type="scope.row.tag === '家' ? 'primary' : 'success'"
-              close-transition>{{scope.row.tag}}</el-tag>
-          </template>-->
+        <el-table-column v-for="(column,index) in columns" sortable
+          :prop="column"
+          :label="column">
         </el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
@@ -59,6 +34,7 @@ export default {
         tableVisible : false,
         saveLoading : false,
         btnSaveText:'保存',
+        listLoading: true,
         editFormTtile:'上传结果',
         tableData: [],
         columns:[]
@@ -69,7 +45,12 @@ export default {
         console.log(file, fileList);
       },
       handlePreview(file) {
-        console.log(file);
+        let _this = this;
+        _this.listLoading = true;
+        _this.columns = file.response.columns;
+        _this.tableVisible = true;
+        _this.tableData = JSON.parse(file.response.data);
+        _this.listLoading = false;
       },
       handleSuccess(response, file, fileList){
         let _this = this;
@@ -78,20 +59,17 @@ export default {
                         message: response.msg,
                         type: 'info'
                     });
-        console.log(response.data);
-        if(response.data){
-          let firstRow = response.data[0];
-          if(firstRow){
-            console.log(response.data.length);
-          }
-        }
+
+        _this.columns = response.columns;
         _this.tableVisible = true;
+        _this.tableData = JSON.parse(response.data);
+        _this.listLoading = false;
       },
       handleError(err, response, file){
 
       },
       saveSubmit(){
-
+        this.listLoading = true;
       },
       formatter(row, column) {
         return row.address;
