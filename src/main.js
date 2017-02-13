@@ -60,8 +60,8 @@ const routes = [
     iconCls: 'fa fa-calculator',
     children: [
       { path: '/upload_data', name: '导入数据', component: UploadData, iconCls: 'fa fa-cloud-upload' },
-      { path: '/export_data', name: '导出数据', component: ExportData, iconCls: 'fa fa-cloud-download' },
-      { path: '/commission_calculation', name: '计算提成', component: CommissionCalculation, iconCls: 'fa fa-calculator' },
+      // { path: '/export_data', name: '导出数据', component: ExportData, iconCls: 'fa fa-cloud-download' },
+      { path: '/commission_calculation', name: '计算金额', component: CommissionCalculation, iconCls: 'fa fa-calculator' },
       // { path: '/add_user', name: '新增用户' }
     ]
   },

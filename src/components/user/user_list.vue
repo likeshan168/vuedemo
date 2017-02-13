@@ -28,7 +28,7 @@
                 </el-table-column>
                 <el-table-column prop="name" label="用户名" width="180" sortable>
                 </el-table-column>
-                <el-table-column prop="password" label="密码" width="100" :formatter="formatSex" sortable>
+                <el-table-column prop="password" label="密码" width="100" sortable>
                 </el-table-column>
                 <el-table-column prop="email" label="邮箱" width="200" sortable>
                 </el-table-column>

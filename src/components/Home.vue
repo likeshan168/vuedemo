@@ -26,7 +26,7 @@
 							<el-menu-item v-for="child in item.children" :index="child.path">
 								<template>
 									<i :class="child.iconCls"></i>{{child.name}}
-								</template>	
+								</template>
 							</el-menu-item>
 						</el-submenu>
 						<el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
@@ -46,7 +46,7 @@
 					<el-col :span="24" style="background-color:#fff;box-sizing: border-box;">
 						<!--<transition name="fade">-->
 						<router-view></router-view>
-						
+
 						<!--</transition>-->
 					</el-col>
 				</div>
@@ -56,48 +56,48 @@
 	</el-row>
 </template>
 <script>
-		import { fetchUser } from '../api/api';
-		export default {
-			data() {
-				return {
-					currentPath: '/',
-					currentPathName: '首页',
-					currentPathNameParent: '',
-					currentUserName: fetchUser()?fetchUser().name:''
-				}
+	import { fetchUser } from '../api/api';
+	export default {
+		data() {
+			return {
+				currentPath: '/',
+				currentPathName: '首页',
+				currentPathNameParent: '',
+				currentUserName: fetchUser() ? fetchUser().name : '',
+			}
+		},
+		watch: {
+			'$route'(to, from) {//监听路由改变
+				this.currentPath = to.path;
+				this.currentPathName = to.name;
+				this.currentPathNameParent = to.matched[0].name;
+			}
+		},
+		methods: {
+			onSubmit() {
+				console.log('submit!');
 			},
-			watch: {
-				'$route'(to, from) {//监听路由改变
-					this.currentPath = to.path;
-					this.currentPathName = to.name;
-					this.currentPathNameParent = to.matched[0].name;
-				}
+			handleopen() {
+				//console.log('handleopen');
 			},
-			methods: {
-				onSubmit() {
-					console.log('submit!');
-				},
-				handleopen() {
-					//console.log('handleopen');
-				},
-				handleclose() {
-					//console.log('handleclose');
-				},
-				handleselect: function (a, b) {
-				},
-				//退出登录
-				logout: function () {
-					var _this = this;
-					this.$confirm('确认退出吗?', '提示', {
-						//type: 'warning'
-					}).then(() => {
-						_this.$router.replace('/login');
-					}).catch((err) => {
-						
-					});
-				}
+			handleclose() {
+				//console.log('handleclose');
+			},
+			handleselect: function (a, b) {
+			},
+			//退出登录
+			logout: function () {
+				var _this = this;
+				this.$confirm('确认退出吗?', '提示', {
+					//type: 'warning'
+				}).then(() => {
+					_this.$router.replace('/login');
+				}).catch((err) => {
+
+				});
 			}
 		}
+	}
 
 </script>
 <style scoped>

@@ -66,6 +66,7 @@
       saveSubmit() {
         this.listLoading = true;
         this.saveLoading = true;
+        console.log(this.tableData);
         commitData({ columnCount: this.columns.length, commissions: this.tableData }).then(data => {
           this.listLoading = false;
           this.saveLoading = false;
