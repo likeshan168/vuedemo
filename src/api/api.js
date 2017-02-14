@@ -22,6 +22,11 @@ export const commitData = params => {
 export const GetCommissions = params => {
     return axios.post(`${base1}/GetCommissions`, params).then(res => res.data);
 };
+export const DelCommissions = params => {
+    return axios.post(`${base1}/DeleteCommission`, params).then(res => res.data).catch(err=>{
+        return false;
+    });
+};
 //local store
 const USER_KEY = 'user';
 export const fetchUser = () => {

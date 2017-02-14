@@ -10,7 +10,7 @@
         <el-table highlight-current-row v-loading="listLoading" :data="tableData" height="300" border style="width: auto">
           <el-table-column type="index" width="80" label="序号">
           </el-table-column>
-          <el-table-column v-for="(column,index) in columns" sortable :prop="column" :label="column">
+          <el-table-column v-for="(column,index) in columns" sortable :prop="column" :label="column" :formatter="formatDate">
           </el-table-column>
         </el-table>
         <div slot="footer" class="dialog-footer">
@@ -66,7 +66,6 @@
       saveSubmit() {
         this.listLoading = true;
         this.saveLoading = true;
-        console.log(this.tableData);
         commitData({ columnCount: this.columns.length, commissions: this.tableData }).then(data => {
           this.listLoading = false;
           this.saveLoading = false;
@@ -76,6 +75,7 @@
               message: data.msg,
               type: 'info'
             });
+             this.tableVisible = false;
           } else {
             this.$notify({
               title: '信息',
@@ -91,7 +91,36 @@
       },
       filterTag(value, row) {
         return row.tag === value;
-      }
+      },
+      formatDate(row, column) {
+        if (column.label === '收款日期') {
+          let tmpDate = +row.收款日期;
+          if (tmpDate > 0) {
+            return this.formatD(tmpDate);
+          }
+          else {
+            return '';
+          }
+        } else if (column.label === '工作单日期') {
+          let tmpDate = +row.工作单日期;
+          if (tmpDate > 0) {
+            return this.formatD(tmpDate);
+          }
+          else {
+            return '';
+          }
+        }
+        else {
+          return row[column.label];
+        }
+      },
+      formatD(d) {
+        let date = new Date(d);
+        let Y = date.getFullYear() + '-';
+        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        let D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+        return (Y + M + D);
+      },
     }
   }
 

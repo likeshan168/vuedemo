@@ -2,24 +2,20 @@
     <section>
         <!--工具条-->
         <el-col :span="24" class="toolbar">
-            <el-row :gutter="20">
+            <el-row :gutter="10">
                 <!--<el-form :inline="true" :model="filters" ref="filters" v-on:submit="getCommissions">-->
                 <!--<el-form-item prop="filterName">-->
                 <el-col :span="4">
-                    <el-tooltip content="业务员" placement="bottom">
-                        <el-input v-model="filters.saleMan" placeholder="业务员" auto-complete="off" @keyup.enter.native="getCommissions"></el-input>
-                    </el-tooltip>
-                </el-col>
-                <el-col :span="4">
-                    <el-tooltip content="委托人简称" placement="bottom">
-                        <el-input v-model="filters.principal" placeholder="委托人简称" auto-complete="off" @keyup.enter.native="getCommissions"></el-input>
+                    <el-tooltip content="工作号,业务员,委托人简称" placement="bottom">
+                        <el-input v-model="filters.saleMan" placeholder="工作号,业务员,委托人简称" auto-complete="off" @keyup.enter.native="getCommissions"
+                            icon="search" :on-icon-click="getCommissions"></el-input>
                     </el-tooltip>
                 </el-col>
                 <!--</el-form-item>-->
                 <!--<el-form-item>-->
-                <el-col :span="2">
+                <!--<el-col :span="2">
                     <el-button type="primary" @click.native="getCommissions" icon="search">搜索</el-button>
-                </el-col>
+                </el-col>-->
                 <!--<el-button type="primary" @click.native="SetMonth">设置结款类型</el-button>-->
                 <el-col :span="4">
                     <el-tooltip content="设置结款类型" placement="bottom">
@@ -29,7 +25,6 @@
                 <el-col :span="4">
                     <el-tooltip content="扣除比例(%)" placement="bottom">
                         <el-input-number v-model="proportion" :step="0.01">
-                            <!--<template slot="append">%</template>-->
                         </el-input-number>
                     </el-tooltip>
                 </el-col>
@@ -38,6 +33,9 @@
                 </el-col>
                 <el-col :span="2">
                     <el-button type="info" @click.native="getCommissions"><i class="fa fa-file-excel-o fa-1x" aria-hidden="true"></i>导出</el-button>
+                </el-col>
+                <el-col :span="2">
+                    <el-button type="warning" @click.native="handleDel" icon="del">删除</el-button>
                 </el-col>
             </el-row>
         </el-col>
@@ -93,28 +91,77 @@
             <el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
                 :page-size="size" :total="total" style="float:right;">
                 </el-pagination>
+                <el-tooltip content="选择要显示的列" placement="top">
+                    <el-popover placement="right" width="400" trigger="click" v-model="popVisible">
+                        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAllColumns" @change="handleCheckAllColumnsChange">全选</el-checkbox>
+                        <div style="margin: 15px 0;"></div>
+                        <el-checkbox-group v-model="checkedColumns" @change="handleCheckedColumnsChange">
+                            <!--<template>
+                                <el-col :span="4">-->
+                                    <el-checkbox v-for="column in Columns" :label="column">{{column}}</el-checkbox>
+                                <!--</el-col>-->
+                            <!--</template>-->
+
+                        </el-checkbox-group>
+                        <div style="text-align: right; margin: 0">
+                            <el-button size="mini" type="text" @click="popVisible = false">关闭</el-button>
+                        </div>
+                        <el-button slot="reference"><i class="el-icon-setting"></i></el-button>
+                    </el-popover>
+
+                </el-tooltip>
         </el-col>
         <!--编辑界面-->
-        <!--<el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
-            <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-                <el-form-item label="用户名" prop="name">
-                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
+        <el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
+            <el-form :model="editForm" :inline="true" label-width="80px" ref="editForm">
+                <el-form-item label="工作号" prop="工作号">
+                    <el-input v-model="editForm.工作号" auto-complete="off" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="editForm.password" auto-complete="off"></el-input>
+                <el-form-item label="业务员" prop="业务员">
+                    <el-input v-model="editForm.业务员" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="editForm.email"></el-input-number>
+                <el-form-item label="委托人简称" prop="委托人简称">
+                    <el-input v-model="editForm.委托人简称"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="phoneNumber">
-                    <el-input v-model="editForm.phoneNumber"></el-input-number>
+                <el-form-item label="利润" prop="利润">
+                    <el-input v-model="editForm.利润"></el-input>
+                </el-form-item>
+                <el-form-item label="应收折合" prop="应收折合">
+                    <el-input v-model="editForm.应收折合"></el-input>
+                </el-form-item>
+                <el-form-item label="未收折合" prop="未收折合">
+                    <el-input v-model="editForm.未收折合"></el-input>
+                </el-form-item>
+                <el-form-item label="收款日期" prop="收款日期">
+                    <el-date-picker v-model="editForm.收款日期" type="date" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="超期日期" prop="超期日期">
+                    <el-date-picker v-model="editForm.超期日期" :disabled="true" type="date" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="月数" prop="月数">
+                    <el-input-number v-model="editForm.月数" :min="0" :step="1" @change="handleMonthChange"></el-input-number>
+                </el-form-item>
+                <el-form-item label="超期回款资金成本" prop="超期回款资金成本">
+                    <el-input v-model="editForm.超期回款资金成本" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="金额">
+                    <el-input v-model="editForm.金额" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="工作单日期" prop="工作单日期">
+                    <el-date-picker v-model="editForm.工作单日期" type="date" placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="kb" prop="kb">
+                    <el-input v-model="editForm.kb"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="editFormVisible = false">取 消</el-button>
                 <el-button type="primary" @click.native="editSubmit" :loading="editLoading">{{btnEditText}}</el-button>
             </div>
-        </el-dialog>-->
+        </el-dialog>
 
         <el-dialog title="选择结款类型" v-model="moneyTypeFormVisible" size="tiny">
             <el-autocomplete class="inline-input" v-model="moneyType" :fetch-suggestions="querySearch" placeholder="请输入内容" @select="handleSelect"></el-autocomplete>
@@ -124,17 +171,24 @@
             </div>
         </el-dialog>
 
+        <!--<el-popover ref="popoverColumn" placement="top" width="400" trigger="click">
+            <el-table>
+                <el-table-column width="150" property="date" label="日期"></el-table-column>
+                <el-table-column width="100" property="name" label="姓名"></el-table-column>
+                <el-table-column width="300" property="address" label="地址"></el-table-column>
+            </el-table>
+        </el-popover>-->
     </section>
 </template>
 <script>
     import NProgress from 'nprogress';
-    import { GetCommissions,commitData } from '../../api/api';
+    import { GetCommissions, commitData, DelCommissions } from '../../api/api';
+    const columnOptions = ['工作号', '业务员', '委托人简称', '利润', '应收折合', '未收折合', '收款日期', '超期日期', '月数', '超期回款资金成本', '金额', '工作单日期', 'KB'];
     export default {
         data() {
             return {
                 filters: {
                     saleMan: '',
-                    principal: ''
                 },
                 multipleSelection: [],
                 salesman: [],
@@ -143,15 +197,23 @@
                 page: 1,
                 size: 20,
                 listLoading: false,
-                saveLoading:false,
+                saveLoading: false,
                 editFormVisible: false,//编辑界面显是否显示
                 editFormTtile: '编辑',
                 editForm: {
-                    id: 0,
-                    name: '',
-                    password: '',
-                    email: '',
-                    phoneNumber: '',
+                    工作号: '',
+                    业务员: '',
+                    委托人简称: '',
+                    利润: 0,
+                    应收折合: 0,
+                    未收折合: 0,
+                    收款日期: '',
+                    超期日期: '',
+                    月数: 0,
+                    超期回款资金成本: 0,
+                    金额: 0,
+                    工作单日期: '',
+                    kb: ''
                 },
                 //结款类型
                 moneyType: '',
@@ -161,20 +223,13 @@
 
                 editLoading: false,
                 btnEditText: '提 交',
-                editFormRules: {
-                    name: [
-                        { required: true, message: '请输入姓名', trigger: 'blur' }
-                    ],
-                    password: [
-                        { required: true, message: '请输入密码', trigger: 'blur' }
-                    ],
-                    email: [
-                        { required: true, message: '请输入邮箱', trigger: 'blur' }
-                    ],
-                    phoneNumber: [
-                        { required: true, message: '请输入手机号', trigger: 'blur' }
-                    ],
-                }
+                //选择显示的列
+                popVisible: false,
+                checkAllColumns: true,
+                checkedColumns: columnOptions,
+                Columns: columnOptions,
+                isIndeterminate: false
+
             }
         },
         methods: {
@@ -225,26 +280,22 @@
                 let para;
                 let whereStr = '';
                 if (this.filters.saleMan) {
-                    whereStr = `业务员='${this.filters.saleMan}' `;
-                }
-                if (this.filters.principal) {
-                    if (whereStr)
-                        whereStr += `and 委托人简称='${this.filters.principal}' `;
-                    else
-                        whereStr = `委托人简称='${this.filters.principal}' `;
+                    whereStr = `业务员 like '%${this.filters.saleMan}%' or 委托人简称 like '%${this.filters.saleMan}%' or 工作号 like '%${this.filters.saleMan}%' `;
                 }
                 if (whereStr) {
                     para = {
                         index: this.page,
                         size: this.size,
                         orderField: '业务员',
-                        whereStr: whereStr
+                        whereStr: whereStr,
+                        columns: this.checkedColumns
                     };
                 } else {
                     para = {
                         index: this.page,
                         size: this.size,
-                        orderField: '工作号'
+                        orderField: '工作号',
+                        columns: this.checkedColumns
                     };
                 }
                 this.listLoading = true;
@@ -285,23 +336,49 @@
             //删除
             handleDel(row) {
                 var _this = this;
+
+                let para;
+                if (row.工作号) {
+                    para = [{ 工作号: row.工作号 }]
+                }
+                else {
+                    para = _this.multipleSelection;
+                    console.log(para.length);
+                    if (!para || para.length === 0) {
+                        _this.$notify({
+                            title: '消息',
+                            message: '请选择要删除的行',
+                            type: 'info'
+                        });
+                        return;
+                    }
+                }
+
                 this.$confirm('确认删除该记录吗', '提示', {
                     type: 'info'
                 }).then(() => {
                     _this.listLoading = true;
                     NProgress.start();
-                    let para = { id: row.id }
-                    deleteUser(para).then(res => {
+
+
+                    DelCommissions(para).then(res => {
                         _this.listLoading = false;
                         NProgress.done();
-                        _this.$notify({
-                            title: '成功',
-                            message: '删除成功',
-                            type: 'success'
-                        });
-                        _this.getCommissions();
+                        if (res) {
+                            _this.$notify({
+                                title: '消息',
+                                message: '删除成功',
+                                type: 'success'
+                            });
+                            _this.getCommissions();
+                        } else {
+                            _this.$notify({
+                                title: '消息',
+                                message: '删除失败',
+                                type: 'error'
+                            });
+                        }
                     })
-
                 }).catch(() => {
                 })
             },
@@ -309,11 +386,36 @@
             handleEdit: function (row) {
                 this.editFormVisible = true;
                 this.editFormTtile = '编辑';
-                this.editForm.id = row.id;
-                this.editForm.name = row.name;
-                this.editForm.password = row.password;
-                this.editForm.email = row.email;
-                this.editForm.phoneNumber = row.phoneNumber;
+                this.editForm.工作号 = row.工作号;
+                this.editForm.业务员 = row.业务员;
+                this.editForm.委托人简称 = row.委托人简称;
+                this.editForm.利润 = row.利润;
+                this.editForm.应收折合 = row.应收折合;
+                this.editForm.未收折合 = row.未收折合;
+                this.editForm.收款日期 = row.收款日期;
+                this.editForm.超期日期 = row.超期日期;
+                this.editForm.月数 = row.月数;
+                this.editForm.超期回款资金成本 = row.超期回款资金成本;
+                this.editForm.金额 = row.金额;
+                this.editForm.工作单日期 = row.工作单日期;
+                this.editForm.kb = row.kb;
+            },
+            //编辑界面中月数的改变
+            handleMonthChange(val) {
+                let beyondDate = this.calculateBeyondDate(this.editForm.工作单日期, +val);
+                this.editForm.超期日期 = beyondDate;
+                let collectionDate = this.editForm.收款日期;
+                //超期
+                let profits = this.editForm.利润;
+                if (collectionDate > beyondDate) {
+                    let beyondDays = collectionDate - beyondDate;
+                    let beyondCost = (+(beyondDays / (1000 * 60 * 60 * 24))) * profits * this.proportion / 100;
+                    this.editForm.超期回款资金成本 = +beyondCost.toFixed(2);
+                    this.editForm.金额 = +(profits - beyondCost).toFixed(2);
+                } else {
+                    this.editForm.金额 = +(profits).toFixed(2);
+                    this.editForm.超期回款资金成本 = 0.00;
+                }
             },
             //提交编辑
             editSubmit() {
@@ -324,38 +426,70 @@
                             _this.editLoading = true;
                             NProgress.start();
                             _this.btnEditText = '提交中';
+                            let cdate = new Date(_this.editForm.收款日期);
+                            let wdate = new Date(_this.editForm.工作单日期);
                             let para = {
-                                id: _this.editForm.id,
-                                name: _this.editForm.name,
-                                password: _this.editForm.password,
-                                email: _this.editForm.email,
-                                phoneNumber: _this.editForm.phoneNumber,
+                                工作号: _this.editForm.工作号,
+                                业务员: _this.editForm.业务员,
+                                委托人简称: _this.editForm.委托人简称,
+                                利润: _this.editForm.利润,
+                                应收折合: _this.editForm.应收折合,
+                                未收折合: _this.editForm.未收折合,
+                                收款日期: cdate.getTime() + 480 * 60 * 1000,
+                                超期日期: _this.editForm.超期日期,
+                                应收折合: _this.editForm.应收折合,
+                                月数: _this.editForm.月数,
+                                超期回款资金成本: _this.editForm.超期回款资金成本,
+                                金额: _this.editForm.金额,
+                                工作单日期: wdate.getTime() + 480 * 60 * 1000,
+                                kb: _this.editForm.kb
                             };
-                            if (_this.editForm.id == 0) {
-                                requestRegister(para).then((res) => {
+                            console.log(para);
+                            if (_this.editForm.工作号 === "") {
+                                commitData({ columnCount: 0, commissions: [para] }).then((res) => {
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
-                                    _this.$notify({
-                                        title: '成功',
-                                        message: '提交成功',
-                                        type: 'success'
-                                    });
-                                    _this.editFormVisible = false;
-                                    _this.getCommissions();
+                                    if (res.code === 200) {
+                                        _this.$notify({
+                                            title: '消息',
+                                            message: '提交成功',
+                                            type: 'success'
+                                        });
+                                        _this.editFormVisible = false;
+                                        _this.getCommissions();
+                                    }
+                                    else {
+                                        _this.$notify({
+                                            title: '消息',
+                                            message: res.msg,
+                                            type: 'error'
+                                        });
+                                    }
+
                                 });
                             } else {
-                                updateUser(para).then((res) => {
+                                commitData({ columnCount: 0, commissions: [para] }).then((res) => {
+                                    console.log(res);
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
-                                    _this.$notify({
-                                        title: '成功',
-                                        message: '提交成功',
-                                        type: 'success'
-                                    });
-                                    _this.editFormVisible = false;
-                                    _this.getCommissions();
+                                    if (res.code === 200) {
+                                        _this.$notify({
+                                            title: '消息',
+                                            message: '提交成功',
+                                            type: 'success'
+                                        });
+                                        _this.editFormVisible = false;
+                                        _this.getCommissions();
+                                    }
+                                    else {
+                                        _this.$notify({
+                                            title: '消息',
+                                            message: res.msg,
+                                            type: 'error'
+                                        });
+                                    }
                                 })
                             }
                         })
@@ -416,7 +550,8 @@
                 //获取工作日期当月的最后一天日期
                 let date2 = date.setMonth(date.getMonth() + moneyType);
                 let date3 = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-                return date3.getTime();
+                var timezoneOffset = date.getTimezoneOffset();
+                return date3.getTime() + 480 * 60 * 1000;
             },
 
             handleSelectionChange(val) {
@@ -429,6 +564,16 @@
                 }
                 return '';
 
+            },
+
+            handleCheckAllColumnsChange(event) {
+                this.checkedColumns = event.target.checked ? this.Columns : [];
+                this.isIndeterminate = false;
+            },
+            handleCheckedColumnsChange(value) {
+                let checkedCount = value.length;
+                this.checkAllColumns = checkedCount === this.Columns.length;
+                this.isIndeterminate = checkedCount > 0 && checkedCount < this.Columns.length;
             }
         },
         mounted() {
