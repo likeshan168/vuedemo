@@ -36,11 +36,12 @@ const routes = [
   {
     path: '/',
     component: Home,
-    name: '首页',
+    // name: '首页',
     iconCls: 'fa fa-home',
     hidden: true,//不显示在导航中
+    // leaf: true,
     children: [
-      { path: '/', name: '首页', component: Intro }
+      { path: '', name: '首页', component: Intro }
     ]
   },
   {
@@ -76,6 +77,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   NProgress.start();
   // console.log(sessionStorage.getItem('access_token'));
+  console.log(to.path);
   try {
     if (!to.fullPath.startsWith("/login") && !sessionStorage.getItem('access_token')) {
       next({

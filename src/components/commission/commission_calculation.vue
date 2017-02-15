@@ -389,7 +389,7 @@
                 let whereStr = '';
                 console.log(this.dateType);
                 console.log(this.pickDate);
-                if (this.pickDate) {
+                if (this.pickDate && this.pickDate[0] && this.pickDate[1]) {
                     whereStr = `${this.dateType} between '${this.formatD(this.pickDate[0])}' and '${this.formatD(this.pickDate[1])}' `;
                 }
                 if (this.filters.saleMan) {
@@ -711,8 +711,6 @@
             },
             //筛选行
             filterRows(value, row) {
-                // return row["委托人简称"] === '嘉瑞德成';
-                // console.log(value);
                 if (value === '未结款') {
                     return +row.收款日期 < 0;
                 } else if (value === '超期结款') {

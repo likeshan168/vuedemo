@@ -2,8 +2,10 @@
 	<el-row class="panel">
 		<el-col :span="24" class="panel-top">
 			<el-col :span="20" style="font-size:26px;">
-				<img src="../assets/logo4.png" class="logo"> <span>AD<i style="color:#20a0ff">MIN</i>
-</span>
+				<img src="../assets/logo4.png" class="logo">
+				<span>
+					AD<i style="color:#20a0ff">MIN</i>
+				</span>
 			</el-col>
 			<el-col :span="4">
 				<el-tooltip class="item tip-logout" effect="dark" content="退出" placement="bottom" style="padding:0px;">
@@ -45,7 +47,8 @@
 					</el-col>
 					<el-col :span="24" style="background-color:#fff;box-sizing: border-box;">
 						<!--<transition name="fade">-->
-						<router-view></router-view>
+						<router-view>
+						</router-view>
 
 						<!--</transition>-->
 					</el-col>
