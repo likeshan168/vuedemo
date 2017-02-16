@@ -23,15 +23,15 @@
 				<el-menu style="border-top: 1px solid #475669;" :default-active="currentPath" class="el-menu-vertical-demo" @open="handleopen"
 					@close="handleclose" @select="handleselect" theme="dark" unique-opened router>
 					<template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
-						<el-submenu :index="index+''" v-if="!item.leaf">
+						<el-submenu :index="index+''" v-if="!item.leaf&&isValidRoute(item.name)">
 							<template slot="title"><i :class="item.iconCls"></i>{{item.name}}</template>
-							<el-menu-item v-for="child in item.children" :index="child.path">
+							<el-menu-item v-for="child in item.children" :index="child.path" v-if="isValidRoute(child.name)">
 								<template>
 									<i :class="child.iconCls"></i>{{child.name}}
 								</template>
 							</el-menu-item>
 						</el-submenu>
-						<el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+						<el-menu-item v-if="item.leaf&&item.children.length>0 && isValidRoute(item.children[0].name)" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
 					</template>
 					</el-menu>
 			</aside>
@@ -67,6 +67,7 @@
 				currentPathName: '首页',
 				currentPathNameParent: '',
 				currentUserName: fetchUser() ? fetchUser().name : '',
+				routes: []
 			}
 		},
 		watch: {
@@ -98,7 +99,20 @@
 				}).catch((err) => {
 
 				});
+			},
+			isValidRoute(name) {
+				if (!this.routes)
+					return true;
+				if (this.routes.find(a => a.name === name)) {
+					return true;
+				} else {
+					return false;
+				}
 			}
+		},
+		mounted() {
+			this.routes = JSON.parse(sessionStorage.getItem('routes'));
+			// console.log(JSON.parse(sessionStorage.getItem('routes')));
 		}
 	}
 

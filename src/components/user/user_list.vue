@@ -12,7 +12,7 @@
             <el-button type="primary" @click.native="getUsers">查询</el-button>
             <!--</el-form-item>
                 <el-form-item>-->
-            <el-button type="primary" @click.native="handleAdd">新增</el-button>
+            <el-button type="primary" @click.native="handleAdd" v-if="checkCreateAutority()">新增</el-button>
             <!--</el-form-item>
             </el-form>-->
         </el-col>
@@ -37,7 +37,7 @@
                 <el-table-column inline-template :context="_self" label="操作" width="140">
                     <span>
                         <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-                        <el-button type="danger" size="small" @click="handleDel(row)">删除</el-button>
+                        <el-button type="danger" size="small" @click="handleDel(row)" v-if="checkDelAutority()">删除</el-button>
                     </span>
                 </el-table-column>
             </el-table>
@@ -46,7 +46,7 @@
         <el-col :span="24" class="toolbar" style="padding-bottom:10px;">
             <el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
                 :page-size="size" :total="total" style="float:right;">
-            </el-pagination>
+                </el-pagination>
         </el-col>
         <!--编辑界面-->
         <el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
@@ -114,7 +114,9 @@
                     phoneNumber: [
                         { required: true, message: '请输入手机号', trigger: 'blur' }
                     ],
-                }
+                },
+                //用户权限列表
+                routes: []
             }
         },
         methods: {
@@ -152,6 +154,9 @@
                 this.listLoading = true;
                 NProgress.start();
                 getUserList(para).then(res => {
+                    if (res.code === 403) {
+                        this.$router.push({ path: 'login', query: { redirect: 'user_list' }})
+                    }
                     this.total = res.total;
                     this.users = res.users;
                     this.listLoading = false;
@@ -257,13 +262,34 @@
                 this.editForm.email = '';
                 this.editForm.phoneNumber = '';
             },
-
+            //check the authority
+            checkCreateAutority() {
+                if (!this.routes)
+                    return true;
+                if (this.routes.find(r => r.name === '用户列表' && r.op === 'c'))
+                    return true;
+                else
+                    return false;
+            },
+            checkDelAutority() {
+                if (!this.routes)
+                    return true;
+                if (this.routes.find(r => r.name === '用户列表' && r.op === 'd')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
         },
         mounted() {
+            // console.log(JSON.parse(sessionStorage.getItem("routes")));
+            this.routes = JSON.parse(sessionStorage.getItem('routes'));
             this.getUsers();
         }
     }
+
 </script>
 <style scoped>
-    
+
 </style>

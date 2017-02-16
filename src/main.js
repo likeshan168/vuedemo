@@ -76,23 +76,22 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  // console.log(sessionStorage.getItem('access_token'));
-  console.log(to.path);
-  try {
-    if (!to.fullPath.startsWith("/login") && !sessionStorage.getItem('access_token')) {
-      next({
-        path: '/login',
-        query: { redirect: to.fullPath }
-      });
-    } else {
-      next();
-    }
-  } catch (error) {
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    });
-  }
+  next();
+  // try {
+  //   if (!to.fullPath.startsWith("/login") && !sessionStorage.getItem('access_token')) {
+  //     next({
+  //       path: '/login',
+  //       query: { redirect: to.fullPath }
+  //     });
+  //   } else {
+  //     next();
+  //   }
+  // } catch (error) {
+  //   next({
+  //     path: '/login',
+  //     query: { redirect: to.fullPath }
+  //   });
+  // }
 })
 
 router.afterEach(transition => {

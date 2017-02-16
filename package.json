@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "babel-polyfill": "^6.23.0",
     "element-ui": "^1.1.5",
     "flex.css": "^1.1.6",
     "font-awesome": "^4.7.0",

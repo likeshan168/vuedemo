@@ -1,18 +1,19 @@
 <template>
-    <div id="app">
-        <router-view></router-view>
-    </div>
+	<div id="app">
+		<router-view></router-view>
+	</div>
 </template>
 <script>
-    export default {
-        name: 'app',
-        components: {
+	export default {
+		name: 'app',
+		components: {
 
-        },
-        created() {
-            // this.$router.replace('/login');
-        }
-    }
+		},
+		created() {
+			// this.$router.replace('/login');
+		}
+	}
+
 </script>
 
 <style>
@@ -49,16 +50,16 @@
 			transform: scale(0);
 		}
 	}
-
-
-
-	.fade-enter-active, .fade-leave-active {
+	
+	.fade-enter-active,
+	.fade-leave-active {
 		transition: opacity .5s
 	}
-	.fade-enter, .fade-leave-active {
+	
+	.fade-enter,
+	.fade-leave-active {
 		opacity: 0
 	}
-
 	
 	body {
 		/*background-color: #324057;*/
@@ -88,7 +89,7 @@
 		vertical-align: baseline;
 		margin-right: 10px;
 	}
-
+	
 	.toolbar .el-form-item {
 		margin-bottom: 10px;
 	}
