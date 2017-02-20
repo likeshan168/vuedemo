@@ -13,7 +13,34 @@ export const deleteUser = params => { return axios.post(`${base}/delete`, params
 export const getUserList = params => { return axios.post(`${base}/getList`, params).then(res => res.data).catch(err=>{
     return { msg: '网络出错', code: 500 }
 }); };
+export const getRoleList = params => { return axios.post(`${base}/getRoleList`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const getRouteList = params => { return axios.post(`${base}/getRouteList`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const addRoute = params => { return axios.post(`${base}/addRoute`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const updateRoute = params => { return axios.post(`${base}/updateRoute`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const deleteRoute = params => { return axios.post(`${base}/deleteRoute`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const getRouteByRoleId = params => { return axios.get(`${base}/getRouteByRoleId/?roleId=${params.roleId}`).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
 
+export const addRole = params => { return axios.post(`${base}/addRole`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const updateRole = params => { return axios.post(`${base}/updateRole`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
+export const deleteRole = params => { return axios.post(`${base}/deleteRole`, params).then(res => res.data).catch(err=>{
+    return { msg: '网络出错', code: 500 }
+}); };
 //文件上传
 let base1 = 'http://localhost:63787/api/commission';
 export const commitData = params => {

@@ -3,41 +3,27 @@
         <!--工具条-->
         <el-col :span="24" class="toolbar">
             <el-row :gutter="20">
-                <!--<el-form :inline="true" :model="filters" ref="filters" v-on:submit="getUsers">-->
-                <!--<el-form-item prop="filterName">-->
                 <el-col :span="6">
-                    <el-input v-model="filters.filterName" placeholder="姓名" icon="search" :on-icon-click="getUsers" auto-complete="off" @keyup.enter.native="getUsers"></el-input>
+                    <el-input v-model="filters.filterName" placeholder="角色名" icon="search" :on-icon-click="getRoles" auto-complete="off" @keyup.enter.native="getRoles"></el-input>
                 </el-col>
-                <!--</el-form-item>-->
-                <!--<el-form-item>-->
-                <!--<el-button type="primary" @click.native="getUsers">查询</el-button>-->
-                <!--</el-form-item>
-                <el-form-item>-->
                 <el-button type="primary" @click.native="handleAdd" v-if="checkCreateAutority()">新增</el-button>
-                <!--</el-form-item>
-            </el-form>-->
             </el-row>
         </el-col>
 
         <!--列表-->
         <template>
-            <el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
-                <!--<el-table-column type="index" width="80" label="序号">
-                </el-table-column>-->
+            <el-table :data="roles" highlight-current-row v-loading="listLoading" style="width: 100%;" @expand="expandRow">
+                <el-table-column type="expand">
+                    <!--<template scope="props">-->
+                    <el-col :span="6" v-for="route in allRoutes"><span>{{route.name}}</span></el-col>
+                    <!--</template>-->
+                </el-table-column>
                 <el-table-column width="80" label="序号">
                     <template scope="scope">
                         {{(scope.$index + 1)+(page-1)*size}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="用户名" width="180" sortable>
-                </el-table-column>
-                <el-table-column prop="password" label="密码" width="100" sortable>
-                </el-table-column>
-                <el-table-column prop="email" label="邮箱" width="200" sortable>
-                </el-table-column>
-                <el-table-column prop="phoneNumber" label="手机号" width="180" sortable>
-                </el-table-column>
-                <el-table-column prop="roleName" label="角色" width="180" sortable>
+                <el-table-column prop="roleName" label="角色名" width="180" sortable>
                 </el-table-column>
                 <el-table-column inline-template :context="_self" label="操作" width="140">
                     <span>
@@ -55,30 +41,24 @@
         </el-col>
         <!--编辑界面-->
         <el-dialog :title="editFormTtile" v-model="editFormVisible" :close-on-click-modal="false">
-            <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-                <el-form-item label="用户名" prop="name">
-                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="editForm.password" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="editForm.email"></el-input-number>
-                </el-form-item>
-                <el-form-item label="手机号" prop="phoneNumber">
-                    <el-input v-model="editForm.phoneNumber"></el-input-number>
-                </el-form-item>
-                <!--<el-form-item label="角色" prop="roleName">
-                    <el-input v-model="editForm.roleName"></el-input-number>
-                </el-form-item>-->
-                <el-form-item label="角色">
-                    <el-select v-model="editForm.roleId" placeholder="请选择" v-if="checkCreateAutority()">
-                        <el-option v-for="item in roles" :label="item.roleName" :value="item.roleId">
-                        </el-option>
-                    </el-select>
-                    <el-input v-model="editForm.roleName" v-else :disabled="true"></el-input-number>
+            <el-form :model="editForm" :rules="editFormRules" ref="editForm">
+                <el-form-item label="角色名" prop="roleName">
+                    <el-input v-model="editForm.roleName" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
+            <el-row>
+                <el-col :span="24">
+                    <el-tag type="primary">r: 只读权限</el-tag>
+                    <el-tag type="success">c: 创建权限</el-tag>
+                    <el-tag type="warning">u: 更新权限</el-tag>
+                    <el-tag type="danger">d: 删除权限</el-tag>
+                </el-col>
+            </el-row>
+            <el-checkbox-group v-model="checkList">
+                <el-col :span="6" v-for="route in allRoutes">
+                    <el-checkbox :label="route.Name"></el-checkbox>
+                </el-col>
+            </el-checkbox-group>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="editFormVisible = false">取 消</el-button>
                 <el-button type="primary" @click.native="editSubmit" :loading="editLoading">{{btnEditText}}</el-button>
@@ -88,7 +68,7 @@
 </template>
 <script>
     import NProgress from 'nprogress';
-    import { getUserList, deleteUser, updateUser, requestRegister, getRoleList } from '../../api/api';
+    import { getRoleList, getRouteByRoleId, addRole, updateRole, deleteRole } from '../../api/api';
     const cols = ['u.*', 'r.RoleName'];
     export default {
         data() {
@@ -101,7 +81,6 @@
                         { required: true, message: '请输入查询条件', trigger: 'blur' }
                     ]
                 },
-                users: [],
                 total: 0,
                 page: 1,
                 size: 20,
@@ -109,73 +88,58 @@
                 editFormVisible: false,//编辑界面显是否显示
                 editFormTtile: '编辑',
                 editForm: {
-                    id: 0,
-                    name: '',
-                    password: '',
-                    email: '',
-                    phoneNumber: '',
-                    roleId: '',
-                    roleName: ''
+                    roleId: 0,
+                    roleName: '',
                 },
                 editLoading: false,
                 btnEditText: '提 交',
                 editFormRules: {
-                    name: [
-                        { required: true, message: '请输入姓名', trigger: 'blur' }
-                    ],
-                    password: [
-                        { required: true, message: '请输入密码', trigger: 'blur' }
-                    ],
-                    email: [
-                        { required: true, message: '请输入邮箱', trigger: 'blur' }
-                    ],
-                    phoneNumber: [
-                        { required: true, message: '请输入手机号', trigger: 'blur' }
+                    roleName: [
+                        { required: true, message: '请输入角色名称', trigger: 'blur' }
                     ],
                 },
-                //用户权限列表
-                routes: [],
                 //角色信息
                 roles: [],
+                //角色相关的路由信息
+                // routes: [],
+                checkList: [],
+                //所有的路由信息
+                allRoutes: [],
             }
         },
         methods: {
-            //性别显示转换
-            formatSex: function (row, column) {
-                return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-            },
             handleCurrentChange(val) {
                 this.page = val;
-                this.getUsers();
+                this.getRoles();
             },
             handleSizeChange(val) {
                 this.size = val;
-                this.getUsers();
+                this.getRoles();
             },
             //获取用户列表
-            getUsers() {
-                // alert('alert');
+            getRoles() {
                 let para;
+                this.allRoutes = JSON.parse(sessionStorage.getItem('all_routes')) || '';
                 if (this.filters.filterName) {
                     para = {
                         index: this.page,
                         size: this.size,
-                        orderField: 'Id',
-                        whereStr: `name='${this.filters.filterName}'`,
-                        columns: cols
+                        orderField: 'RoleId',
+                        whereStr: `RoleName='${this.filters.filterName}'`,
+                        other: this.allRoutes === ''
                     };
                 } else {
                     para = {
                         index: this.page,
                         size: this.size,
-                        orderField: 'Id',
-                        columns: cols
+                        orderField: 'RoleId',
+                        other: this.allRoutes === ''
                     };
                 }
 
                 this.listLoading = true;
                 NProgress.start();
-                getUserList(para).then(res => {
+                getRoleList(para).then(res => {
                     if (res.code === 403) {
                         this.$router.push({ path: 'login', query: { redirect: 'user_list' } })
                     } else if (res.code !== 200) {
@@ -185,8 +149,13 @@
                             type: 'error'
                         });
                     } else {
+                        if (res.other) {
+                            this.allRoutes = JSON.parse(res.other) || [];
+                            sessionStorage.setItem('all_routes', res.other);
+                        }
+
                         this.total = res.total;
-                        this.users = res.users;
+                        this.roles = res.roles;
                     }
 
                     this.listLoading = false;
@@ -194,26 +163,6 @@
                 });
 
                 return false;
-            },
-            //获取角色信息
-            getRoles() {
-                let para = {
-                    index: 1,
-                    size: 50,
-                    orderField: 'RoleId',
-                };
-                getRoleList(para).then(res => {
-                    // console.log(res.code);
-                    if (res.code !== 200) {
-                        this.$notify({
-                            title: '信息',
-                            message: res.msg,
-                            type: 'error'
-                        });
-                    } else {
-                        this.roles = res.roles;
-                    }
-                });
             },
             //删除
             handleDel(row) {
@@ -240,15 +189,18 @@
             },
             //编辑 or 新增
             handleEdit: function (row) {
-                this.editFormVisible = true;
-                this.editFormTtile = '编辑';
-                this.editForm.id = row.id;
-                this.editForm.name = row.name;
-                this.editForm.password = row.password;
-                this.editForm.email = row.email;
-                this.editForm.phoneNumber = row.phoneNumber;
-                this.editForm.roleId = row.roleId === 0 ? "" : row.roleId;
-                this.editForm.roleName = row.roleName;
+                let _this = this;
+
+                getRouteByRoleId({ roleId: row.roleId }).then(res => {
+                    res.routes.forEach(r => {
+                        this.checkList.push(r.name);
+                    });
+                });
+
+                _this.editFormVisible = true;
+                _this.editFormTtile = '编辑';
+                _this.editForm.roleId = row.roleId;
+                _this.editForm.roleName = row.roleName;
             },
             //提交编辑
             editSubmit() {
@@ -260,16 +212,12 @@
                             NProgress.start();
                             _this.btnEditText = '提交中';
                             let para = {
-                                id: _this.editForm.id,
-                                name: _this.editForm.name,
-                                password: _this.editForm.password,
-                                email: _this.editForm.email,
-                                phoneNumber: _this.editForm.phoneNumber,
                                 roleId: _this.editForm.roleId,
+                                roleName: _this.editForm.roleName,
+                                routeId: _this.checkList.length === 0 ? '' : (_this.checkList.map(r => r.split('-')[0])).join(',')
                             };
-                            console.log(para);
-                            if (_this.editForm.id == 0) {
-                                requestRegister(para).then((res) => {
+                            if (_this.editForm.roleId == 0) {
+                                addRole(para).then((res) => {
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
@@ -279,10 +227,10 @@
                                         type: 'success'
                                     });
                                     _this.editFormVisible = false;
-                                    _this.getUsers();
+                                    _this.getRoles();
                                 });
                             } else {
-                                updateUser(para).then((res) => {
+                                updateRole(para).then((res) => {
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
@@ -292,7 +240,7 @@
                                         type: 'success'
                                     });
                                     _this.editFormVisible = false;
-                                    _this.getUsers();
+                                    _this.getRoles();
                                 })
                             }
                         })
@@ -302,18 +250,16 @@
             //显示新增界面
             handleAdd() {
                 var _this = this;
+                _this.checkList = [];
                 this.editFormVisible = true;
                 this.editFormTtile = '新增';
 
-                this.editForm.id = 0;
-                this.editForm.name = '';
-                this.editForm.password = '';
-                this.editForm.email = '';
-                this.editForm.phoneNumber = '';
+                this.editForm.roleId = 0;
+                this.editForm.roleName = '';
+                
             },
             //check the authority
             checkCreateAutority() {
-                // console.log(this.routes.find(r => r.name === '用户列表' && r.op === 'c'));
                 if (!this.routes)
                     return true;
                 if (this.routes.find(r => r.name === '用户列表' && r.op === 'c'))
@@ -330,13 +276,20 @@
                 else {
                     return false;
                 }
+            },
+            expandRow(row, expanded) {
+                if (expanded) {
+                    let _this = this;
+                    getRouteByRoleId({ roleId: row.roleId }).then(res => {
+                        _this.routes = res.routes;
+                        console.log(_this.routes);
+                    });
+                }
             }
         },
         mounted() {
-            // console.log(JSON.parse(sessionStorage.getItem("routes")));
-            this.routes = JSON.parse(sessionStorage.getItem('routes'));
-            this.getUsers();
             this.getRoles();
+            this.routes = JSON.parse(sessionStorage.getItem('routes'));
         }
     }
 

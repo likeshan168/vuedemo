@@ -58,7 +58,7 @@
                             requestLogin(loginParams).then(data => {
                                 this.logining = false;
                                 NProgress.done();
-                                let { msg, code, user, routes,accessToken } = data;
+                                let { msg, code, user, routes, accessToken } = data;
                                 if (code !== 200) {
                                     this.$notify({
                                         title: '错误',
@@ -66,14 +66,13 @@
                                         type: 'error'
                                     });
                                 } else {
-                                    console.log(accessToken)
-                                    sessionStorage.setItem('access_token', user.accessToken);
+                                    sessionStorage.setItem('access_token', accessToken);
                                     sessionStorage.setItem('routes', JSON.stringify(routes));
                                     localStorage.setItem('user', JSON.stringify(user));
                                     if (this.$route.query.redirect) {
                                         this.$router.push({ path: this.$route.query.redirect, query: { a: accessToken } });
                                     } else {
-                                        this.$router.push({ path: '/' });
+                                        this.$router.push({ path: '/', query: { a: accessToken } });
                                     }
                                 }
                             })

@@ -62,7 +62,7 @@
         <!--列表-->
         <template>
             <el-table :data="commissions" :row-class-name="tableRowClassName" v-loading="listLoading" height="430" style="width: 100%;"
-                @selection-change="handleSelectionChange">
+                @selection-change="handleSelectionChange" @row-dblclick="handleEdit">
                 <!--<el-table-column type="index" width="80" label="序号">
                 </el-table-column>-->
                 <el-table-column type="selection" width="55" fixed="left">
@@ -102,12 +102,12 @@
                 </el-table-column>
                 <el-table-column prop="kb" label="KB" width="120" sortable>
                 </el-table-column>-->
-                    <el-table-column inline-template :context="_self" label="操作" width="120" fixed="right">
+                    <!--<el-table-column inline-template :context="_self" label="操作" width="120" fixed="right">
                         <span>
                         <el-button size="small" @click="handleEdit(row)" icon="edit"></el-button>
                         <el-button type="danger" size="small" @click="handleDel(row)" icon="delete"></el-button>
                     </span>
-                    </el-table-column>
+                    </el-table-column>-->
                     </el-table>
         </template>
         <!--分页-->
@@ -387,8 +387,6 @@
             getCommissions() {
                 let para;
                 let whereStr = '';
-                console.log(this.dateType);
-                console.log(this.pickDate);
                 if (this.pickDate && this.pickDate[0] && this.pickDate[1]) {
                     whereStr = `${this.dateType} between '${this.formatD(this.pickDate[0])}' and '${this.formatD(this.pickDate[1])}' `;
                 }
@@ -506,7 +504,7 @@
                 })
             },
             //编辑 or 新增
-            handleEdit: function (row) {
+            handleEdit: function (row, event) {
                 this.editFormVisible = true;
                 this.editFormTtile = '编辑';
                 this.editForm.工作号 = row.工作号;

@@ -15,6 +15,8 @@ import Register from './components/register/register'
 import Home from './components/Home';
 import Intro from './components/Intro';
 import UserList from './components/user/user_list';
+import RoleList from './components/user/role_list';
+import RouteList from './components/user/route_list';
 import UploadData from './components/commission/upload_data';
 import ExportData from './components/commission/export_data';
 import CommissionCalculation from './components/commission/commission_calculation';
@@ -51,6 +53,8 @@ const routes = [
     iconCls: 'fa fa-user',
     children: [
       { path: '/user_list', name: '用户列表', component: UserList, iconCls: 'fa fa-users' },
+      { path: '/role_list', name: '角色列表', component: RoleList, iconCls: 'fa fa-user-circle' },
+      { path: '/route_list', name: '路由列表', component: RouteList, iconCls: 'fa fa-link' },
       // { path: '/add_user', name: '新增用户' }
     ]
   },
@@ -76,22 +80,24 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  next();
-  // try {
-  //   if (!to.fullPath.startsWith("/login") && !sessionStorage.getItem('access_token')) {
-  //     next({
-  //       path: '/login',
-  //       query: { redirect: to.fullPath }
-  //     });
-  //   } else {
-  //     next();
-  //   }
-  // } catch (error) {
-  //   next({
-  //     path: '/login',
-  //     query: { redirect: to.fullPath }
-  //   });
-  // }
+  // console.log(sessionStorage.getItem('access_token'))
+  try {
+    if (!to.fullPath.startsWith("/login") && (sessionStorage.getItem('access_token') === 'undefined' || sessionStorage.getItem('access_token') === null)) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      });
+    } else {
+      // console.log(to.path);
+      next();
+      
+    }
+  } catch (error) {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    });
+  }
 })
 
 router.afterEach(transition => {

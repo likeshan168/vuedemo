@@ -3,3 +3,6 @@
 [0119/095149:ERROR:tcp_listen_socket.cc(76)] Could not bind socket to 127.0.0.1:6004
 [0119/095149:ERROR:node_debugger.cc(86)] Cannot start debugger server
 [0212/192651.958:ERROR:exception_handler_server.cc(524)] ConnectNamedPipe: 管道正在被关闭。 (0xE8)
+[0217/103544.549:ERROR:process_reader_win.cc(233)] ReadMemory at 0x37298da1 of 512 bytes failed: 仅完成部分的 ReadProcessMemory 或 WriteProcessMemory 请求。 (0x12B)
+[0217/103544.553:ERROR:crash_report_exception_handler.cc(111)] WriteEverything failed
+[0217/103544.553:ERROR:scoped_process_suspend.cc(38)] NtResumeProcess: 已尝试访问正在退出的过程。  (0xc000010a)

@@ -25,7 +25,7 @@
 					<template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
 						<el-submenu :index="index+''" v-if="!item.leaf&&isValidRoute(item.name)">
 							<template slot="title"><i :class="item.iconCls"></i>{{item.name}}</template>
-							<el-menu-item v-for="child in item.children" :index="child.path" v-if="isValidRoute(child.name)">
+							<el-menu-item v-for="child in item.children" :index="changePath(child.path)" v-if="isValidRoute(child.name)">
 								<template>
 									<i :class="child.iconCls"></i>{{child.name}}
 								</template>
@@ -67,11 +67,13 @@
 				currentPathName: '首页',
 				currentPathNameParent: '',
 				currentUserName: fetchUser() ? fetchUser().name : '',
-				routes: []
+				routes: [],
+				a: sessionStorage.getItem('access_token')
 			}
 		},
 		watch: {
 			'$route'(to, from) {//监听路由改变
+				// console.log(this.$route.query)
 				this.currentPath = to.path;
 				this.currentPathName = to.name;
 				this.currentPathNameParent = to.matched[0].name;
@@ -95,6 +97,7 @@
 				this.$confirm('确认退出吗?', '提示', {
 					//type: 'warning'
 				}).then(() => {
+					sessionStorage.removeItem('access_token');
 					_this.$router.replace('/login');
 				}).catch((err) => {
 
@@ -108,6 +111,9 @@
 				} else {
 					return false;
 				}
+			},
+			changePath(path) {
+				return path + '?a=' + this.a;
 			}
 		},
 		mounted() {
