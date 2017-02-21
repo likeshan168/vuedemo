@@ -1,9 +1,11 @@
 import axios from 'axios';
-
-let base = 'http://localhost:63787/api/account';
+let server = 'http://101.201.28.235:82/';
+// let server = 'http://localhost:63787/';
+let base = server + 'api/account';
 
 export const requestLogin = params => {
     return axios.post(`${base}/login`, params).then(res => res.data).catch(err => {
+        console.log(err)
         return { msg: '网络出错', code: 500 }
     });
 };
@@ -62,7 +64,7 @@ export const deleteRole = params => {
     });
 };
 //文件上传
-let base1 = 'http://localhost:63787/api/commission';
+let base1 = server + 'api/commission';
 export const commitData = params => {
     return axios.post(`${base1}/SaveData`, params).then(res => res.data).catch(err => {
         return { msg: '保存数据出错', code: 500 }
