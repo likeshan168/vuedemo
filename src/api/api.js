@@ -10,37 +10,57 @@ export const requestLogin = params => {
 export const requestRegister = params => { return axios.post(`${base}/register`, params).then(res => res.data); };
 export const updateUser = params => { return axios.post(`${base}/update`, params).then(res => res.data); };
 export const deleteUser = params => { return axios.post(`${base}/delete`, params).then(res => res.data); };
-export const getUserList = params => { return axios.post(`${base}/getList`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const getRoleList = params => { return axios.post(`${base}/getRoleList`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const getRouteList = params => { return axios.post(`${base}/getRouteList`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const addRoute = params => { return axios.post(`${base}/addRoute`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const updateRoute = params => { return axios.post(`${base}/updateRoute`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const deleteRoute = params => { return axios.post(`${base}/deleteRoute`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const getRouteByRoleId = params => { return axios.get(`${base}/getRouteByRoleId/?roleId=${params.roleId}`).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
+export const getUserList = params => {
+    return axios.post(`${base}/getList`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const getRoleList = params => {
+    return axios.post(`${base}/getRoleList`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const getRouteList = params => {
+    return axios.post(`${base}/getRouteList`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const addRoute = params => {
+    return axios.post(`${base}/addRoute`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const updateRoute = params => {
+    return axios.post(`${base}/updateRoute`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const deleteRoute = params => {
+    return axios.post(`${base}/deleteRoute`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const getRouteByRoleId = params => {
+    return axios.get(`${base}/getRouteByRoleId/?roleId=${params.roleId}`).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
 
-export const addRole = params => { return axios.post(`${base}/addRole`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const updateRole = params => { return axios.post(`${base}/updateRole`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
-export const deleteRole = params => { return axios.post(`${base}/deleteRole`, params).then(res => res.data).catch(err=>{
-    return { msg: '网络出错', code: 500 }
-}); };
+export const addRole = params => {
+    return axios.post(`${base}/addRole`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const updateRole = params => {
+    return axios.post(`${base}/updateRole`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
+export const deleteRole = params => {
+    return axios.post(`${base}/deleteRole`, params).then(res => res.data).catch(err => {
+        return { msg: '网络出错', code: 500 }
+    });
+};
 //文件上传
 let base1 = 'http://localhost:63787/api/commission';
 export const commitData = params => {
@@ -195,4 +215,24 @@ export const JSONToExcelConvertor = (JSONData, FileName, ShowLabel) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+//生成GUID码
+const S4 = () => {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+}
+
+export const NewGuid1 = () => {
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
+
+export const NewGuid2 = () => {
+    var guid = "";
+    for (var i = 1; i <= 32; i++) {
+        var n = Math.floor(Math.random() * 16.0).toString(16);
+        guid += n;
+        if ((i == 8) || (i == 12) || (i == 16) || (i == 20))
+            guid += "-";
+    }
+    return guid;
 }

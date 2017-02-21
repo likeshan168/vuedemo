@@ -5,7 +5,7 @@
             <el-input type="text" v-model="formModel.account" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
         <el-form-item prop="checkPass">
-            <el-input type="password" v-model="formModel.checkPass" auto-complete="off" placeholder="密码"></el-input>
+            <el-input type="password" v-model="formModel.checkPass" auto-complete="off" placeholder="密码" @keyup.enter.native="handleSubmit2"></el-input>
         </el-form-item>
         <el-checkbox v-model="checked" checked style="margin:0px 0px 35px 0px;">记住密码</el-checkbox>
         <el-form-item style="width:100%;">

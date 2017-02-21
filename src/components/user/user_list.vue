@@ -88,7 +88,7 @@
 </template>
 <script>
     import NProgress from 'nprogress';
-    import { getUserList, deleteUser, updateUser, requestRegister, getRoleList } from '../../api/api';
+    import { getUserList, deleteUser, updateUser, requestRegister, getRoleList, NewGuid1} from '../../api/api';
     const cols = ['u.*', 'r.RoleName'];
     export default {
         data() {
@@ -126,12 +126,12 @@
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' }
                     ],
-                    email: [
-                        { required: true, message: '请输入邮箱', trigger: 'blur' }
-                    ],
-                    phoneNumber: [
-                        { required: true, message: '请输入手机号', trigger: 'blur' }
-                    ],
+                    // email: [
+                    //     { required: true, message: '请输入邮箱', trigger: 'blur' }
+                    // ],
+                    // phoneNumber: [
+                    //     { required: true, message: '请输入手机号', trigger: 'blur' }
+                    // ],
                 },
                 //用户权限列表
                 routes: [],
@@ -269,30 +269,48 @@
                             };
                             console.log(para);
                             if (_this.editForm.id == 0) {
+                                para.id= NewGuid1();
                                 requestRegister(para).then((res) => {
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
-                                    _this.$notify({
-                                        title: '成功',
-                                        message: '提交成功',
-                                        type: 'success'
-                                    });
-                                    _this.editFormVisible = false;
-                                    _this.getUsers();
+                                    if (res.code === 200) {
+                                        _this.$notify({
+                                            title: '信息',
+                                            message: '提交成功',
+                                            type: 'success'
+                                        });
+                                        _this.editFormVisible = false;
+                                        _this.getUsers();
+                                    } else {
+                                        _this.$notify({
+                                            title: '信息',
+                                            message: res.msg,
+                                            type: 'error'
+                                        });
+                                    }
+
                                 });
                             } else {
                                 updateUser(para).then((res) => {
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
-                                    _this.$notify({
-                                        title: '成功',
-                                        message: '提交成功',
-                                        type: 'success'
-                                    });
-                                    _this.editFormVisible = false;
-                                    _this.getUsers();
+                                    if (res) {
+                                        _this.$notify({
+                                            title: '信息',
+                                            message: '提交成功',
+                                            type: 'success'
+                                        });
+                                        _this.editFormVisible = false;
+                                        _this.getUsers();
+                                    } else {
+                                        _this.$notify({
+                                            title: '信息',
+                                            message: '更新失败',
+                                            type: 'error'
+                                        });
+                                    }
                                 })
                             }
                         })
