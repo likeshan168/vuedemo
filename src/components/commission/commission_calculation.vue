@@ -258,7 +258,7 @@
 <script>
     import NProgress from 'nprogress';
     import { GetCommissions, commitData, DelCommissions, JSONToExcelConvertor } from '../../api/api';
-    const columnOptions = ['工作号', '业务员', '委托人简称', '利润', '应收折合', '未收折合', '收款日期', '超期日期', '月数', '超期回款资金成本', '金额', '工作单日期', 'KB'];
+    const columnOptions = ['工作号', '业务员', '委托人简称', '利润', '应收折合', '未收折合', '收款日期', '超期日期', '月数', '超期回款资金成本', '金额', '工作单日期', 'kb'];
     export default {
         data() {
             return {
