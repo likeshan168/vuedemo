@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-upload action="http://localhost:63787/api/commission/upload" type="drag" :multiple="true" :on-preview="handlePreview"
+    <el-upload action="http://101.201.28.235:82/api/commission/upload" type="drag" :multiple="true" :on-preview="handlePreview"
       :on-remove="handleRemove" :on-success="handleSuccess" :on-error="handleError">
       <i class="el-icon-upload"></i>
       <div class="el-dragger__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -75,7 +75,7 @@
               message: data.msg,
               type: 'info'
             });
-             this.tableVisible = false;
+            this.tableVisible = false;
           } else {
             this.$notify({
               title: '信息',
