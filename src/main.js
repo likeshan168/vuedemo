@@ -20,6 +20,7 @@ import RouteList from './components/user/route_list';
 import UploadData from './components/commission/upload_data';
 import ExportData from './components/commission/export_data';
 import CommissionCalculation from './components/commission/commission_calculation';
+import MonthConfig from './components/commission/month_config';
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -67,6 +68,7 @@ const routes = [
       { path: '/upload_data', name: '导入数据', component: UploadData, iconCls: 'fa fa-cloud-upload' },
       // { path: '/export_data', name: '导出数据', component: ExportData, iconCls: 'fa fa-cloud-download' },
       { path: '/commission_calculation', name: '计算金额', component: CommissionCalculation, iconCls: 'fa fa-calculator' },
+      { path: '/month_config', name: '结算配置', component: MonthConfig, iconCls: 'fa fa-calculator' },
       // { path: '/add_user', name: '新增用户' }
     ]
   },
@@ -90,7 +92,7 @@ router.beforeEach((to, from, next) => {
     } else {
       // console.log(to.path);
       next();
-      
+
     }
   } catch (error) {
     next({

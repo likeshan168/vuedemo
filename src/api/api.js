@@ -1,6 +1,6 @@
 import axios from 'axios';
-let server = 'http://101.201.28.235:82/';
-// let server = 'http://localhost:63787/';
+// let server = 'http://101.201.28.235:82/';
+let server = 'http://localhost:63787/';
 let base = server + 'api/account';
 
 export const requestLogin = params => {
@@ -78,6 +78,23 @@ export const DelCommissions = params => {
         return false;
     });
 };
+let base2 = server + 'api/monthconfig';
+export const GetMonthConfig = paras => {
+    return axios.post(`${base2}/getMonthConfig`, paras).then(res => res.data).catch(err => {
+        return { msg: '获取数据出错', code: 500 }
+    })
+}
+export const UpdateMonthConfig = paras => {
+    console.log(paras);
+    return axios.post(`${base2}/UpdateMonthConfig`, paras).then(res => res.data).catch(err => {
+        return { msg: '获取数据出错', code: 500 }
+    })
+}
+export const DeleteMonthConfig = paras => {
+    return axios.post(`${base2}/DeleteMonthConfig`, paras).then(res => res.data).catch(err => {
+        return { msg: '获取数据出错', code: 500 }
+    })
+}
 //local store
 const USER_KEY = 'user';
 export const fetchUser = () => {

@@ -46,6 +46,7 @@
                     <el-input v-model="editForm.roleName" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
+            <!--提示-->
             <el-row>
                 <el-col :span="24">
                     <el-tag type="primary">r: 只读权限</el-tag>
@@ -54,6 +55,7 @@
                     <el-tag type="danger">d: 删除权限</el-tag>
                 </el-col>
             </el-row>
+            <!---->
             <el-checkbox-group v-model="checkList">
                 <el-col :span="6" v-for="route in allRoutes">
                     <el-checkbox :label="route.Name"></el-checkbox>
@@ -149,7 +151,9 @@
                             type: 'error'
                         });
                     } else {
+                        console.log(res.other);
                         if (res.other) {
+                            // console.log(res.other);
                             this.allRoutes = JSON.parse(res.other) || [];
                             sessionStorage.setItem('all_routes', res.other);
                         }
@@ -190,6 +194,7 @@
             //编辑 or 新增
             handleEdit: function (row) {
                 let _this = this;
+                _this.checkList = [];
 
                 getRouteByRoleId({ roleId: row.roleId }).then(res => {
                     res.routes.forEach(r => {
@@ -256,7 +261,7 @@
 
                 this.editForm.roleId = 0;
                 this.editForm.roleName = '';
-                
+
             },
             //check the authority
             checkCreateAutority() {
@@ -282,7 +287,7 @@
                     let _this = this;
                     getRouteByRoleId({ roleId: row.roleId }).then(res => {
                         _this.routes = res.routes;
-                        console.log(_this.routes);
+                        // console.log(_this.routes);
                     });
                 }
             }
@@ -290,6 +295,7 @@
         mounted() {
             this.getRoles();
             this.routes = JSON.parse(sessionStorage.getItem('routes'));
+            // console.log(this.routes);
         }
     }
 

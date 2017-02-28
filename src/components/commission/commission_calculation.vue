@@ -46,7 +46,7 @@
                         </el-tooltip>
                     </el-col>
                     <el-col :span="4">
-                        <el-button type="info" size="small" @click.native="submitUpdates"><i class="fa fa-floppy-o fa-1x" aria-hidden="true"></i>保存</el-button>
+                        <el-button type="info" size="small" @click.native="submitUpdates"><i class="fa fa-floppy-o fa-1x" aria-hidden="true"></i>计提</el-button>
                     </el-col>
                 </el-col>
                 <el-col :span="4">
@@ -73,8 +73,8 @@
                     </template>
                 </el-table-column>
                 <el-table-column v-for="(column,index) in checkedColumns" width="180" sortable :prop="column" :label="column" :formatter="formatDate"
-                    :filters="[{ text: '超期结款', value: '超期结款' }, { text: '正常结款', value: '正常结款' }, { text: '未结款', value: '未结款' }]"
-                    :filter-method="filterRows">
+                    :filters="column!='是否已经计提'? [{ text: '超期结款', value: '超期结款' }, { text: '正常结款', value: '正常结款' }, { text: '未结款', value: '未结款' }]:[{ text: '已计提', value: '已计提' },{ text: '未计提', value: '未计提' }]"
+                    :filter-method="filterRows" :filtered-value="filteredValues">
                     </el-table-column>
                     <!--<el-table-column prop="工作号" label="工作号" width="180" sortable>
                 </el-table-column>
@@ -113,7 +113,7 @@
         <!--分页-->
         <el-col :span="24" class="toolbar" style="padding-bottom:10px;">
             <el-pagination layout="total, prev, pager, next, sizes" @current-change="handleCurrentChange" @size-change="handleSizeChange"
-                :page-size="size" :total="total" style="float:right;">
+                :page-size="size" :total="total" style="float:right;" :page-sizes="[10, 20, 30, 40, 50, 100,500,1000]">
                 </el-pagination>
                 <el-tooltip content="选择要显示的列" placement="top">
                     <el-popover placement="right" width="600" trigger="click" v-model="popVisible">
@@ -164,7 +164,10 @@
                             </el-row>
                             <el-row>
                                 <el-col :span="6">
-                                    <el-checkbox label="KB"></el-checkbox>
+                                    <el-checkbox label="kb"></el-checkbox>
+                                </el-col>
+                                <el-col :span="6">
+                                    <el-checkbox label="是否已经计提"></el-checkbox>
                                 </el-col>
                             </el-row>
                         </el-checkbox-group>
@@ -258,13 +261,14 @@
 <script>
     import NProgress from 'nprogress';
     import { GetCommissions, commitData, DelCommissions, JSONToExcelConvertor } from '../../api/api';
-    const columnOptions = ['工作号', '业务员', '委托人简称', '利润', '应收折合', '未收折合', '收款日期', '超期日期', '月数', '超期回款资金成本', '金额', '工作单日期', 'kb'];
+    const columnOptions = ['是否已经计提', '工作号', '业务员', '委托人简称', '利润', '应收折合', '未收折合', '收款日期', '超期日期', '月数', '超期回款资金成本', '金额', '工作单日期', 'kb'];
     export default {
         data() {
             return {
                 filters: {
                     saleMan: '',
                 },
+                filteredValues: [],
                 multipleSelection: [],
                 salesman: [],
                 commissions: [],
@@ -304,7 +308,10 @@
                 checkedColumns: columnOptions,
                 Columns: columnOptions,
                 isIndeterminate: false,
-
+                //所有的结款配置项
+                allConfigs: [],
+                //临时变量 保存变更的数据
+                tmpCommissions: [],
                 //日期范围选择
                 dateType: '',
                 pickDate: '',
@@ -396,62 +403,114 @@
                     else
                         whereStr = `业务员 like '%${this.filters.saleMan}%' or 委托人简称 like '%${this.filters.saleMan}%' or 工作号 like '%${this.filters.saleMan}%' `;
                 }
+                // console.log(this.filteredValues);
+                this.allConfigs = JSON.parse(sessionStorage.getItem('all_configs')) || '';
+                // console.log(this.allConfigs);
                 if (whereStr) {
                     para = {
                         index: this.page,
                         size: this.size,
                         orderField: '业务员',
                         whereStr: whereStr,
-                        columns: this.checkedColumns
+                        columns: this.checkedColumns,
+                        other: this.allConfigs === ''
                     };
                 } else {
                     para = {
                         index: this.page,
                         size: this.size,
                         orderField: '工作号',
-                        columns: this.checkedColumns
+                        columns: this.checkedColumns,
+                        other: this.allConfigs === ''
                     };
                 }
                 this.listLoading = true;
                 NProgress.start();
                 GetCommissions(para).then(res => {
-                    this.total = res.total;
-                    this.commissions = res.commissions;
+                    // console.log(res);
+                    if (res.code === 200) {
+                        this.total = res.total;
+                        if (res.other) {
+                            this.allConfigs = JSON.parse(res.other) || [];
+                            sessionStorage.setItem('all_configs', res.other);
+                        }
+                        //计算结款金额
+                        let tmpComs = res.commissions;
+                        this.tmpCommissions = [];
+                        this.allConfigs.forEach(c => {
+                            let coms = tmpComs.filter(t => t.是否已经计提 !== '已计提' && t.委托人简称 === c.委托人简称);
+                            this.calculateTheMoney(coms, c.月数);
+                            //这个需要保存的
+                            coms.forEach(t => this.tmpCommissions.push(t));
+                            // this.tmpCommissions.push(coms);
+
+                        });
+                        this.tmpCommissions = this.tmpCommissions.filter(t => t.月数 !== 0);
+                        console.log(this.tmpCommissions);
+                        this.commissions = tmpComs;
+                    } else {
+                        this.$notify({ title: '信息', message: res.msg, type: 'error' });
+                    }
+
                     this.listLoading = false;
                     NProgress.done();
                 });
 
                 return false;
             },
+            // 根据配置计提
+            calculateTheMoney(commissions, month) {
+                commissions.forEach(c => {
+                    let beyondDate = this.calculateBeyondDate(c.工作单日期, +month);
+                    let collectionDate = c.收款日期;
+                    let profits = c.利润;
+                    if (collectionDate > beyondDate) {
+                        c.月数 = +month;
+                        let beyondDays = collectionDate - beyondDate;
+                        let beyondCost = (+(beyondDays / (1000 * 60 * 60 * 24))) * profits * this.proportion / 100;
+                        c.超期回款资金成本 = +beyondCost.toFixed(2);
+                        c.金额 = +(profits - beyondCost).toFixed(2);
+                        c.超期日期 = beyondDate;
+                    } else {
+                        //正常结款
+                        if (collectionDate > 0) {
+                            c.月数 = +month;
+                            c.金额 = +(profits).toFixed(2);
+                            c.超期日期 = beyondDate;
+                        }
+                    }
+                })
+            },
             //将计提结果保存到数据库
             submitUpdates() {
-                if (this.multipleSelection.length === 0) {
+                if (this.tmpCommissions.length === 0) {
                     this.$notify({
                         title: '信息',
-                        message: '请选需要设置结款的行，然后再进行保存',
+                        message: '没有需要保存的数据',
                         type: 'info'
                     });
                     return;
-                }
-                this.listLoading = true;
-                this.saveLoading = true;
-                commitData({ columnCount: 0, commissions: this.commissions }).then(data => {
-                    this.listLoading = false;
-                    this.saveLoading = false;
-                    if (data && data.code === 200) {
-                        this.$notify({
-                            title: '信息',
-                            message: data.msg,
-                            type: 'info'
-                        });
-                    } else {
-                        this.$notify({
-                            title: '信息',
-                            message: data ? data.msg : '保存失败',
-                            type: 'error'
-                        });
-                    }
-
+                };
+                this.$confirm('确认要进行计提操作吗', '提示', { type: 'info' }).then(() => {
+                    this.listLoading = true;
+                    this.saveLoading = true;
+                    console.log(this.tmpCommissions);
+                    commitData({ columnCount: 0, commissions: this.tmpCommissions }).then(data => {
+                        this.listLoading = false;
+                        this.saveLoading = false;
+                        if (data && data.code === 200) {
+                            this.commissions.forEach(r => {
+                                if (this.multipleSelection.indexOf(r) >= 0) {
+                                    r.是否已经计提 = '已计提';
+                                }
+                            })
+                            this.$notify({ title: '信息', message: data.msg, type: 'info' });
+                        } else {
+                            this.$notify({
+                                title: '信息', message: data ? data.msg : '保存失败', type: 'error'
+                            });
+                        }
+                    });
                 });
             },
             //删除
@@ -464,7 +523,6 @@
                 }
                 else {
                     para = _this.multipleSelection;
-                    console.log(para.length);
                     if (!para || para.length === 0) {
                         _this.$notify({
                             title: '消息',
@@ -480,8 +538,6 @@
                 }).then(() => {
                     _this.listLoading = true;
                     NProgress.start();
-
-
                     DelCommissions(para).then(res => {
                         _this.listLoading = false;
                         NProgress.done();
@@ -565,7 +621,7 @@
                                 工作单日期: wdate.getTime() + 480 * 60 * 1000,
                                 kb: _this.editForm.kb
                             };
-                            console.log(para);
+                            // console.log(para);
                             if (_this.editForm.工作号 === "") {
                                 commitData({ columnCount: 0, commissions: [para] }).then((res) => {
                                     _this.editLoading = false;
@@ -591,7 +647,7 @@
                                 });
                             } else {
                                 commitData({ columnCount: 0, commissions: [para] }).then((res) => {
-                                    console.log(res);
+                                    // console.log(res);
                                     _this.editLoading = false;
                                     NProgress.done();
                                     _this.btnEditText = '提 交';
@@ -621,6 +677,7 @@
             SetMonth() {
                 this.moneyTypeFormVisible = true;
             },
+            //下拉框中选择结款类型
             querySearch(queryString, cb) {
                 var moneyTypes = this.moneyTypes;
                 var results = queryString ? moneyTypes.filter(this.createFilter(queryString)) : moneyTypes;
@@ -648,6 +705,11 @@
                 }
                 let index;
                 let collectionDate;
+                if (multipleSelection.findIndex(r => r.是否已经计提 === '已计提') >= 0) {
+                    multipleSelection.reduce(r => r.是否已经计提 !== '已计提');
+                    this.$notify({ title: '提示', message: '选择的项包含已经计提的行', type: 'info' });
+                    return;
+                }
                 for (let i = 0; i < multipleSelection.length; i++) {
                     index = comms.findIndex(item => item.工作号 === multipleSelection[i].工作号);
                     comms[index].月数 = +type;
@@ -656,7 +718,7 @@
                     collectionDate = comms[index].收款日期;
                     //超期
                     let profits = comms[index].利润;
-                    console.log(collectionDate);
+                    // console.log(collectionDate);
                     if (collectionDate > beyondDate) {
                         let beyondDays = collectionDate - beyondDate;
                         let beyondCost = (+(beyondDays / (1000 * 60 * 60 * 24))) * profits * this.proportion / 100;
@@ -669,14 +731,11 @@
                             comms[index].金额 = +(profits).toFixed(2);
                             comms[index].超期日期 = beyondDate;
                         } else {//未结款或部分结款
-                            this.$notify({
-                                title: '提示',
-                                message: '选中的行包含未结款或者部分结款，不予计算提成',
-                                type: 'info'
-                            });
                         }
                     }
                 }
+                this.tmpCommissions = multipleSelection;
+                // console.log(multipleSelection);
             },
             calculateBeyondDate(workingDate, moneyType) {
                 let date = new Date(+workingDate);
@@ -715,6 +774,10 @@
                     return row.超期回款资金成本 > 0
                 } else if (value === '正常结款') {
                     return +row.收款日期 > 0 && +row.金额 > 0 && row.超期回款资金成本 === 0
+                } else if (value === '未计提') {
+                    return row.是否已经计提 === undefined || row.是否已经计提 === '';
+                } else if (value === '已计提') {
+                    return row.是否已经计提 === '已计提';
                 }
             },
             //选择日期
